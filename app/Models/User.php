@@ -73,16 +73,7 @@ class User extends Authenticatable
 
     public function getHighestSubscription(): TwitchSubscription
     {
-        $subscription = UserTwitchSubscription::where('user_id', $this->id)
-            ->where('twitch_subscription', '>=', TwitchSubscription::Tier1)
-            ->where(function ($query) {
-                $query->whereIn('broadcaster_id', config('services.twitch.friend_ids'))
-                    ->orWhere('broadcaster_id', config('services.twitch.broadcaster_id'));
-            })
-            ->orderBy('twitch_subscription', 'desc')
-            ->first();
-
-        return $subscription?->twitch_subscription ?? TwitchSubscription::None;
+        return UserTwitchSubscription::where('user_id', $this->id)->max('twitch_subscription');
     }
 
     public function canSubmitQuestion(): bool
